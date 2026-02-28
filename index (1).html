@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOA East LLC — Promotional Products Order Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+    input, select, textarea, button { font-family: inherit; }
+    select { appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7A8D' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; }
+    input:focus, select:focus, textarea:focus { border-color: #1B4D7A !important; outline: none; }
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr !important; }
+      .grid-4 { grid-template-columns: 1fr 1fr !important; }
+      .header-title { font-size: 24px !important; }
+      .card { padding: 20px 16px 8px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef } = React;
+
+    const BRAND = {
+      navy: "#0A1628",
+      blue: "#1B4D7A",
+      accent: "#E8913A",
+      light: "#F4F7FA",
+      white: "#FFFFFF",
+      border: "#D1D9E6",
+      text: "#1A2332",
+      muted: "#6B7A8D",
+      success: "#2D8A56",
+      error: "#C0392B",
+    };
+
+    const DECORATION_METHODS = [
+      "Screen Print", "Embroidery", "Heat Transfer", "Sublimation",
+      "Laser Engrave", "Deboss / Emboss", "Direct-to-Film (DTF)", "Pad Print", "Other",
+    ];
+
+    const PRODUCT_CATEGORIES = [
+      "Apparel - T-Shirts", "Apparel - Polos", "Apparel - Jackets/Outerwear",
+      "Apparel - Headwear/Caps", "Drinkware - Mugs/Tumblers", "Drinkware - Water Bottles",
+      "Bags - Tote/Drawstring", "Bags - Backpacks", "Writing Instruments",
+      "Tech - USB/Power Banks", "Tech - Phone Accessories", "Office/Desk Items",
+      "Awards/Recognition", "Signage/Banners", "Trade Show/Event Items", "Safety/PPE", "Other",
+    ];
+
+    function Input({ label, required, type = "text", value, onChange, placeholder, error, ...props }) {
+      return (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: BRAND.text, marginBottom: 5 }}>
+            {label} {required && <span style={{ color: BRAND.accent }}>*</span>}
+          </label>
+          <input
+            type={type}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder={placeholder}
+            required={required}
+            style={{
+              width: "100%", padding: "10px 14px",
+              border: `1.5px solid ${error ? BRAND.error : BRAND.border}`,
+              borderRadius: 6, fontSize: 14, color: BRAND.text,
+              background: BRAND.white, outline: "none", transition: "border-color 0.2s",
+            }}
+            {...props}
+          />
+          {error && <span style={{ fontSize: 12, color: BRAND.error, marginTop: 3, display: "block" }}>{error}</span>}
+        </div>
+      );
+    }
+
+    function Select({ label, required, value, onChange, options, placeholder, error }) {
+      return (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: BRAND.text, marginBottom: 5 }}>
+            {label} {required && <span style={{ color: BRAND.accent }}>*</span>}
+          </label>
+          <select
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            required={required}
+            style={{
+              width: "100%", padding: "10px 14px",
+              border: `1.5px solid ${error ? BRAND.error : BRAND.border}`,
+              borderRadius: 6, fontSize: 14,
+              color: value ? BRAND.text : BRAND.muted,
+              background: BRAND.white, outline: "none", cursor: "pointer",
+            }}
+          >
+            <option value="" disabled>{placeholder || "Select..."}</option>
+            {options.map(o => <option key={o} value={o}>{o}</option>)}
+          </select>
+          {error && <span style={{ fontSize: 12, color: BRAND.error, marginTop: 3, display: "block" }}>{error}</span>}
+        </div>
+      );
+    }
+
+    function TextArea({ label, required, value, onChange, placeholder, rows = 3 }) {
+      return (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: BRAND.text, marginBottom: 5 }}>
+            {label} {required && <span style={{ color: BRAND.accent }}>*</span>}
+          </label>
+          <textarea
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            placeholder={placeholder}
+            required={required}
+            rows={rows}
+            style={{
+              width: "100%", padding: "10px 14px",
+              border: `1.5px solid ${BRAND.border}`,
+              borderRadius: 6, fontSize: 14, color: BRAND.text,
+              background: BRAND.white, outline: "none", resize: "vertical",
+            }}
+          />
+        </div>
+      );
+    }
+
+    function SizeGrid({ sizes, onChange }) {
+      const sizeLabels = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+      return (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: BRAND.text, marginBottom: 8 }}>
+            Size Breakdown <span style={{ fontWeight: 400, color: BRAND.muted }}>(if apparel)</span>
+          </label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            {sizeLabels.map(s => (
+              <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: BRAND.muted, width: 28 }}>{s}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={sizes[s] || ""}
+                  onChange={e => onChange({ ...sizes, [s]: e.target.value })}
+                  placeholder="0"
+                  style={{
+                    width: "100%", padding: "6px 8px",
+                    border: `1.5px solid ${BRAND.border}`,
+                    borderRadius: 4, fontSize: 13, textAlign: "center",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    const emptyItem = () => ({
+      id: Date.now(),
+      category: "", description: "", color: "",
+      quantity: "", sizes: {}, decoration: "",
+      decorationNotes: "", targetPrice: "",
+    });
+
+    function PromoOrderForm() {
+      const [form, setForm] = useState({
+        companyName: "", contactName: "", contactEmail: "", contactPhone: "",
+        shippingAddress: "", city: "", state: "", zip: "",
+        eventName: "", inHandDate: "", budget: "", artworkReady: "", notes: "",
+      });
+      const [items, setItems] = useState([emptyItem()]);
+      const [submitted, setSubmitted] = useState(false);
+      const [sending, setSending] = useState(false);
+      const [errors, setErrors] = useState({});
+      const formRef = useRef(null);
+
+      const updateForm = (field, val) => {
+        setForm(prev => ({ ...prev, [field]: val }));
+        if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
+      };
+
+      const updateItem = (idx, field, val) => {
+        setItems(prev => prev.map((item, i) => i === idx ? { ...item, [field]: val } : item));
+      };
+
+      const addItem = () => setItems(prev => [...prev, emptyItem()]);
+      const removeItem = idx => setItems(prev => prev.filter((_, i) => i !== idx));
+
+      const validate = () => {
+        const e = {};
+        if (!form.companyName.trim()) e.companyName = "Required";
+        if (!form.contactName.trim()) e.contactName = "Required";
+        if (!form.contactEmail.trim()) e.contactEmail = "Required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contactEmail)) e.contactEmail = "Invalid email";
+        if (!form.contactPhone.trim()) e.contactPhone = "Required";
+        if (!form.inHandDate) e.inHandDate = "Required";
+        items.forEach((item, i) => {
+          if (!item.category) e[`item_${i}_category`] = "Required";
+          if (!item.quantity) e[`item_${i}_quantity`] = "Required";
+        });
+        setErrors(e);
+        return Object.keys(e).length === 0;
+      };
+
+      const buildEmailBody = () => {
+        let body = `NEW ORDER REQUEST — SOA East LLC\n`;
+        body += `${"=".repeat(50)}\n\n`;
+        body += `CUSTOMER INFORMATION\n`;
+        body += `Company: ${form.companyName}\n`;
+        body += `Contact: ${form.contactName}\n`;
+        body += `Email: ${form.contactEmail}\n`;
+        body += `Phone: ${form.contactPhone}\n`;
+        if (form.shippingAddress) body += `Ship To: ${form.shippingAddress}, ${form.city}, ${form.state} ${form.zip}\n`;
+        body += `\nORDER DETAILS\n`;
+        body += `Event/Project: ${form.eventName || "N/A"}\n`;
+        body += `In-Hand Date: ${form.inHandDate}\n`;
+        body += `Budget: ${form.budget || "Not specified"}\n`;
+        body += `Artwork Ready: ${form.artworkReady || "Not specified"}\n\n`;
+        body += `${"=".repeat(50)}\n`;
+        body += `LINE ITEMS\n`;
+        body += `${"=".repeat(50)}\n\n`;
+        items.forEach((item, i) => {
+          body += `ITEM ${i + 1}\n`;
+          body += `Category: ${item.category}\n`;
+          body += `Description: ${item.description || "N/A"}\n`;
+          body += `Color(s): ${item.color || "N/A"}\n`;
+          body += `Quantity: ${item.quantity}\n`;
+          const sizeStr = Object.entries(item.sizes).filter(([, v]) => v && v !== "0").map(([k, v]) => `${k}:${v}`).join(", ");
+          if (sizeStr) body += `Sizes: ${sizeStr}\n`;
+          body += `Decoration: ${item.decoration || "N/A"}\n`;
+          if (item.decorationNotes) body += `Decoration Notes: ${item.decorationNotes}\n`;
+          if (item.targetPrice) body += `Target Unit Price: $${item.targetPrice}\n`;
+          body += `\n`;
+        });
+        if (form.notes) body += `ADDITIONAL NOTES:\n${form.notes}\n`;
+        return body;
+      };
+
+      const handleSubmit = () => {
+        if (!validate()) {
+          formRef.current?.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+        setSending(true);
+        const subject = encodeURIComponent(`Order Request: ${form.companyName} — ${form.eventName || "New Order"}`);
+        const body = encodeURIComponent(buildEmailBody());
+        const mailtoLink = `mailto:sah@hireprecise.com?subject=${subject}&body=${body}`;
+        window.open(mailtoLink, "_blank");
+        setTimeout(() => {
+          setSending(false);
+          setSubmitted(true);
+        }, 1000);
+      };
+
+      if (submitted) {
+        return (
+          <div style={{ minHeight: "100vh", background: `linear-gradient(160deg, ${BRAND.navy} 0%, ${BRAND.blue} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+            <div style={{ background: BRAND.white, borderRadius: 16, padding: 48, maxWidth: 500, width: "100%", textAlign: "center", boxShadow: "0 24px 80px rgba(0,0,0,0.2)" }}>
+              <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 36 }}>✓</div>
+              <h2 style={{ fontSize: 26, fontFamily: "'DM Serif Display', serif", color: BRAND.navy, margin: "0 0 12px" }}>Order Submitted</h2>
+              <p style={{ color: BRAND.muted, fontSize: 15, lineHeight: 1.6, margin: "0 0 32px" }}>
+                Your order request for <strong style={{ color: BRAND.text }}>{form.companyName}</strong> has been prepared and your email client should have opened with the details. Please click send to deliver it to our team. We'll follow up within 1 business day.
+              </p>
+              <button
+                onClick={() => { setSubmitted(false); setForm({ companyName: "", contactName: "", contactEmail: "", contactPhone: "", shippingAddress: "", city: "", state: "", zip: "", eventName: "", inHandDate: "", budget: "", artworkReady: "", notes: "" }); setItems([emptyItem()]); }}
+                style={{ padding: "12px 32px", background: BRAND.blue, color: BRAND.white, border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+              >
+                Submit Another Order
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ minHeight: "100vh", background: BRAND.light }}>
+          {/* Header */}
+          <div style={{ background: `linear-gradient(160deg, ${BRAND.navy} 0%, ${BRAND.blue} 100%)`, padding: "40px 24px 48px", textAlign: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: BRAND.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: BRAND.white, fontWeight: 800, fontSize: 20, fontFamily: "'DM Serif Display', serif" }}>S</span>
+              </div>
+              <span style={{ color: BRAND.white, fontSize: 22, fontWeight: 700, letterSpacing: 0.5 }}>SOA East LLC</span>
+            </div>
+            <h1 className="header-title" style={{ color: BRAND.white, fontSize: 32, fontFamily: "'DM Serif Display', serif", fontWeight: 400, margin: "0 0 8px" }}>Promotional Products Order Form</h1>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, margin: 0 }}>Complete the form below and we'll prepare your quote within 1 business day.</p>
+          </div>
+
+          {/* Form Body */}
+          <div ref={formRef} style={{ maxWidth: 720, margin: "-24px auto 40px", padding: "0 16px" }}>
+
+            {/* Customer Info */}
+            <div className="card" style={{ background: BRAND.white, borderRadius: 12, padding: "28px 28px 12px", marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: BRAND.navy, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 28, height: 28, borderRadius: 6, background: BRAND.accent, color: BRAND.white, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>1</span>
+                Customer Information
+              </h2>
+              <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+                <Input label="Company Name" required value={form.companyName} onChange={v => updateForm("companyName", v)} placeholder="Acme Corp" error={errors.companyName} />
+                <Input label="Contact Name" required value={form.contactName} onChange={v => updateForm("contactName", v)} placeholder="John Smith" error={errors.contactName} />
+                <Input label="Email" required type="email" value={form.contactEmail} onChange={v => updateForm("contactEmail", v)} placeholder="john@acmecorp.com" error={errors.contactEmail} />
+                <Input label="Phone" required type="tel" value={form.contactPhone} onChange={v => updateForm("contactPhone", v)} placeholder="(555) 123-4567" error={errors.contactPhone} />
+              </div>
+              <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "0 12px" }}>
+                <Input label="Shipping Address" value={form.shippingAddress} onChange={v => updateForm("shippingAddress", v)} placeholder="123 Main St" />
+                <Input label="City" value={form.city} onChange={v => updateForm("city", v)} placeholder="Atlanta" />
+                <Input label="State" value={form.state} onChange={v => updateForm("state", v)} placeholder="GA" maxLength={2} />
+                <Input label="ZIP" value={form.zip} onChange={v => updateForm("zip", v)} placeholder="30301" maxLength={10} />
+              </div>
+            </div>
+
+            {/* Order Details */}
+            <div className="card" style={{ background: BRAND.white, borderRadius: 12, padding: "28px 28px 12px", marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: BRAND.navy, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 28, height: 28, borderRadius: 6, background: BRAND.accent, color: BRAND.white, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>2</span>
+                Order Details
+              </h2>
+              <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+                <Input label="Event / Project Name" value={form.eventName} onChange={v => updateForm("eventName", v)} placeholder="Q2 Trade Show, Company Picnic, etc." />
+                <Input label="In-Hand Date" required type="date" value={form.inHandDate} onChange={v => updateForm("inHandDate", v)} error={errors.inHandDate} />
+                <Input label="Budget" value={form.budget} onChange={v => updateForm("budget", v)} placeholder="$500 - $2,000 or per-unit target" />
+                <Select label="Artwork Ready?" value={form.artworkReady} onChange={v => updateForm("artworkReady", v)} options={["Yes — vector files ready", "Yes — but needs cleanup", "No — need design help", "Not sure"]} placeholder="Select..." />
+              </div>
+            </div>
+
+            {/* Line Items */}
+            <div className="card" style={{ background: BRAND.white, borderRadius: 12, padding: "28px 28px 16px", marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: BRAND.navy, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 28, height: 28, borderRadius: 6, background: BRAND.accent, color: BRAND.white, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>3</span>
+                Products Requested
+              </h2>
+
+              {items.map((item, idx) => (
+                <div key={item.id} style={{ border: `1.5px solid ${BRAND.border}`, borderRadius: 10, padding: "20px 20px 4px", marginBottom: 16, position: "relative", background: idx % 2 === 0 ? BRAND.white : "#FAFBFD" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.blue }}>Item {idx + 1}</span>
+                    {items.length > 1 && (
+                      <button onClick={() => removeItem(idx)} style={{ background: "none", border: "none", color: BRAND.error, fontSize: 13, cursor: "pointer", fontWeight: 600 }}>Remove</button>
+                    )}
+                  </div>
+                  <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+                    <Select label="Product Category" required value={item.category} onChange={v => updateItem(idx, "category", v)} options={PRODUCT_CATEGORIES} placeholder="Select category..." error={errors[`item_${idx}_category`]} />
+                    <Input label="Total Quantity" required type="number" min="1" value={item.quantity} onChange={v => updateItem(idx, "quantity", v)} placeholder="100" error={errors[`item_${idx}_quantity`]} />
+                  </div>
+                  <Input label="Product Description / Specific Item" value={item.description} onChange={v => updateItem(idx, "description", v)} placeholder="e.g., Gildan 5000 tee, YETI Rambler 20oz, etc." />
+                  <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+                    <Input label="Color(s)" value={item.color} onChange={v => updateItem(idx, "color", v)} placeholder="Navy, Black, White" />
+                    <Input label="Target Unit Price" value={item.targetPrice} onChange={v => updateItem(idx, "targetPrice", v)} placeholder="$8.50" />
+                  </div>
+                  {item.category?.includes("Apparel") && (
+                    <SizeGrid sizes={item.sizes} onChange={v => updateItem(idx, "sizes", v)} />
+                  )}
+                  <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+                    <Select label="Decoration Method" value={item.decoration} onChange={v => updateItem(idx, "decoration", v)} options={DECORATION_METHODS} placeholder="Select method..." />
+                    <Input label="Decoration Notes" value={item.decorationNotes} onChange={v => updateItem(idx, "decorationNotes", v)} placeholder="Logo placement, # of colors, etc." />
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={addItem}
+                style={{ width: "100%", padding: "12px", background: "none", border: `2px dashed ${BRAND.border}`, borderRadius: 8, color: BRAND.blue, fontSize: 14, fontWeight: 600, cursor: "pointer", marginBottom: 8, transition: "all 0.2s" }}
+                onMouseEnter={e => { e.target.style.borderColor = BRAND.blue; e.target.style.background = "#F0F5FA"; }}
+                onMouseLeave={e => { e.target.style.borderColor = BRAND.border; e.target.style.background = "none"; }}
+              >
+                + Add Another Item
+              </button>
+            </div>
+
+            {/* Notes */}
+            <div className="card" style={{ background: BRAND.white, borderRadius: 12, padding: "28px 28px 12px", marginBottom: 24, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: BRAND.navy, margin: "0 0 20px", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 28, height: 28, borderRadius: 6, background: BRAND.accent, color: BRAND.white, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700 }}>4</span>
+                Additional Notes
+              </h2>
+              <TextArea label="Special Instructions or Notes" value={form.notes} onChange={v => updateForm("notes", v)} placeholder="Any special requirements, packaging needs, delivery instructions, etc." rows={4} />
+            </div>
+
+            {/* Submit */}
+            <button
+              onClick={handleSubmit}
+              disabled={sending}
+              style={{
+                width: "100%", padding: "16px",
+                background: sending ? BRAND.muted : `linear-gradient(135deg, ${BRAND.accent} 0%, #D17A2A 100%)`,
+                color: BRAND.white, border: "none", borderRadius: 10,
+                fontSize: 16, fontWeight: 700,
+                cursor: sending ? "not-allowed" : "pointer",
+                boxShadow: "0 4px 20px rgba(232,145,58,0.35)",
+                transition: "all 0.2s", letterSpacing: 0.3,
+              }}
+            >
+              {sending ? "Preparing Order..." : "Submit Order Request"}
+            </button>
+            <p style={{ textAlign: "center", fontSize: 12, color: BRAND.muted, marginTop: 12 }}>
+              Your order details will be emailed to our team. We'll respond within 1 business day with a quote.
+            </p>
+
+            {/* Footer */}
+            <div style={{ textAlign: "center", padding: "32px 0 16px", borderTop: `1px solid ${BRAND.border}`, marginTop: 32 }}>
+              <p style={{ fontSize: 13, color: BRAND.muted, margin: 0 }}>SOA East LLC — Promotional Products &amp; Branded Merchandise</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<PromoOrderForm />);
+  </script>
+</body>
+</html>
